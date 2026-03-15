@@ -1,8 +1,7 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import clsx from 'clsx';
-import { Eye, Edit } from 'lucide-react';
+import { Edit } from 'lucide-react';
 
 interface TaskTableProps {
   tasks: any[];
