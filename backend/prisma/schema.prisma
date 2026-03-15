@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  role      String   @default("employee") // admin, manager, employee
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  tasks     Task[]   @relation("TaskAssignee")
+  comments  Comment[]
+}
+
+model ReportType {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  active      Boolean  @default(true)
+  tasks       Task[]
+}
+
+model StatusType {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  color     String   @default("#007BFF")
+  active    Boolean  @default(true)
+  isDefault Boolean  @default(false)
+  tasks     Task[]
+}
+
+model Task {
+  id           Int      @id @default(autoincrement())
+  assigneeId   Int
+  reportTypeId Int
+  statusId     Int
+  dueDate      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assignee   User       @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  reportType ReportType @relation(fields: [reportTypeId], references: [id])
+  status     StatusType @relation(fields: [statusId], references: [id])
+  comments   Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  taskId    Int
+  authorId  Int
+  content   String
+  createdAt DateTime @default(now())
+
+  task   Task @relation(fields: [taskId], references: [id])
+  author User @relation(fields: [authorId], references: [id])
+}
+
+model SystemSettings {
+  id                     Int @id @default(autoincrement())
+  defaultDueDays         Int @default(7)
+  orangeWarningDays      Int @default(7)
+}
